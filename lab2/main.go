@@ -140,7 +140,8 @@ func PrintInterpolationNodes(A, B, C, D []float64, h float64, xArr []float64, f 
 		varX := Left + float64(i)*h
 		varY := f(varX)
 		s := A[i] + B[i]*(varX-xArr[i]) + C[i]*math.Pow(varX-xArr[i], 2) + D[i]*math.Pow(varX-xArr[i], 3)
-		fmt.Printf("x: %.1f, y: %.16f, f(x): %.16f, |y-f(x)|: %.16f\n", varX, varY, s, math.Abs(varY-s))
+		fmt.Printf("i: %d, x: %.2f, f(x): %.16f, y: %.16f, |f(x)-y2|: %.16f\n",
+			i+1, varX, s, varY, math.Abs(s-varY))
 	}
 }
 
@@ -150,7 +151,8 @@ func PrintMiddleInterpolationNodes(A, B, C, D []float64, h float64, xArr []float
 		varX := Left + (float64(i+1)-0.5)*h
 		varY := f(varX)
 		s := A[i] + B[i]*(varX-xArr[i]) + C[i]*math.Pow(varX-xArr[i], 2) + D[i]*math.Pow(varX-xArr[i], 3)
-		fmt.Printf("x: %.2f, y: %.16f, f(x): %.16f, |y-f(x)|: %.16f\n", varX, varY, s, math.Abs(varY-s))
+		fmt.Printf("i: %d, x: %.2f, f(x): %.16f, y: %.16f, |f(x)-y|: %.16f\n",
+			i+1, varX, s, varY, math.Abs(s-varY))
 	}
 }
 
@@ -168,6 +170,11 @@ func main() {
 	C := getC(yArr, h)
 	B := getB(yArr, C, h)
 	D := getD(C, h)
+
+	fmt.Println("A:", A)
+	fmt.Println("B:", B)
+	fmt.Println("C:", C)
+	fmt.Println("D:", D)
 
 	PrintInterpolationNodes(A, B, C, D, h, xArr, varFunc)
 	PrintMiddleInterpolationNodes(A, B, C, D, h, xArr, varFunc)
