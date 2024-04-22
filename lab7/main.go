@@ -92,32 +92,23 @@ func findEquationRootsOnSegmentBisectionMethod(left, right float64) float64 {
 	return (right + left) / 2
 }
 
-func findEquationRootsOnSegmentNewtonMethod(initialPoint float64) float64 {
-
+func findEquationRootsOnSegmentNewtonMethod(currentPoint float64) float64 {
 	iterations := 0
 
 	for {
-		fxVal := fx(initialPoint)
-		if math.Abs(fxVal) < eps {
-			break
+		if math.Abs(f(currentPoint)) < eps {
+			fmt.Printf("Найдено методом Ньютона за %d итераций\n", iterations)
+			return currentPoint
 		}
-		fxxVal := fxx(initialPoint)
-		if math.Abs(fxxVal) < eps {
-			break
-		}
-		initialPoint = initialPoint - fxVal/fxxVal
+
+		currentPoint -= f(currentPoint) / fx(currentPoint)
 
 		iterations++
-
 		if iterations > 10000 {
 			fmt.Println("Слишком много итераций")
 			return 0
 		}
 	}
-
-	fmt.Printf("Найдено методом Ньютона за %d итераций\n", iterations)
-
-	return initialPoint
 }
 
 func main() {
