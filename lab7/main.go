@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"gonum.org/v1/gonum/mat"
+	"log"
 	"math"
 
 	"gonum.org/v1/plot"
@@ -111,8 +113,7 @@ func findEquationRootsOnSegmentNewtonMethod(currentPoint float64) float64 {
 	}
 }
 
-func main() {
-	fmt.Println("start program")
+func printEquationSolution() {
 
 	plotGraphic(f, printF, -5, 5, -30, 30)
 
@@ -135,6 +136,64 @@ func main() {
 	fmt.Println("firstRootNew:", firstRootNew)
 	fmt.Println("secondRootNew:", secondRootNew)
 	fmt.Println("thirdRootNew:", thirdRootNew)
+}
+
+// INFO: Решение системы______________________________________________________
+
+func fSystem(x *mat.VecDense) *mat.VecDense {
+	result := mat.NewVecDense(2,
+		[]float64{
+			math.Cos(x.At(0, 0)-1) + x.At(1, 0) - 0.8,
+			x.At(0, 0) - math.Cos(x.At(1, 0)) - 2,
+		})
+	return result
+}
+
+func jacobi(x *mat.VecDense) *mat.Dense {
+	result := mat.NewDense(2, 2,
+		[]float64{
+			-math.Sin(x.At(0, 0) - 1), 1,
+			1, math.Sin(x.At(1, 0)),
+		})
+	return result
+}
+
+func NewtonMethod(x0 *mat.VecDense) *mat.VecDense {
+	x := x0
+
+	for iterations := 0; iterations < 1000; iterations++ {
+		dx := mat.NewVecDense(2, nil)
+		err := dx.SolveVec(jacobi(x), fSystem(x))
+		if err != nil {
+			log.Fatalf("failed solve system %e", err)
+			return nil
+		}
+
+		x.SubVec(x, dx)
+
+		if mat.Norm(dx, 2) < eps {
+			fmt.Printf("iterations: %d\n", iterations)
+			return x
+		}
+	}
+
+	log.Fatalf("too much iterations")
+	return nil
+}
+
+func printSystemSolution() {
+	initialPoint := []float64{2, 1}
+
+	x0 := mat.NewVecDense(2, initialPoint)
+	result := NewtonMethod(x0)
+
+	fmt.Println("Решение: ", result.At(0, 0), result.At(1, 0))
+}
+
+func main() {
+	fmt.Println("start program")
+
+	printEquationSolution()
 
 	fmt.Println("end program")
 }
